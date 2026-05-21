@@ -1,6 +1,6 @@
-# claude-knowledge-system — overview for the team
+# claude-knowledge-system — overview
 
-A way to make Claude actually **remember things** across sessions when you work in many repos.
+A way to make Claude actually **remember things** across sessions when you work in many repos. Also, for you to review what you worked on in the past (via `changelog.md` and `sessions.md`). 
 
 ## The problem
 
