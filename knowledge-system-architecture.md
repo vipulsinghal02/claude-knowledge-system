@@ -592,6 +592,29 @@ For large repos, prioritize the areas you're actively working in. Extract the re
 
 ---
 
+## Known limitations and open design questions
+
+### Cross-repo knowledge transfer is not supported
+
+Each repo's `knowledge/` is independent. An entry saved in repo A is not visible when working in repo B. The `cross_cutting/` subdirectory name is sometimes misread as cross-repo — it actually means **cross-subproject within a single repo**.
+
+This matters for genuinely general insights (e.g. "always use `ProcessPoolExecutor` for pandas, never `ThreadPoolExecutor`" — true regardless of which repo you're in). Today, such an insight has to be saved in each repo's `knowledge/` separately.
+
+**Why it's not solved yet:** the obvious fix is a 5th "global knowledge" layer (`~/.claude/knowledge/`, or a `knowledge/` dir inside the scaffolding repo symlinked into `~/.claude/`). The hard part isn't infrastructure — it's **curation**. A flat global pool with hundreds of entries is no easier to surface than the per-repo dirs are. The right design probably involves:
+- Explicit promotion ("this entry is useful everywhere — promote to global")
+- Tag-based filtering so global entries don't all load every session
+- Some convention for when to *de*-promote (when a "general" insight turns out to be repo-specific)
+
+None of that is designed yet, so the simpler per-repo model stands as the current shape. Possible future work.
+
+**Workaround for now:** if an insight applies to multiple repos, either (a) save it once in the originating repo and copy the file manually into other repos' `knowledge/` dirs, or (b) promote it to your team's actual project docs / a wiki / an internal style guide — i.e. the place where general knowledge lives outside this system.
+
+### What else might land here over time
+
+This section is the canonical home for design gaps. If someone hits a friction point that the system doesn't address (e.g. multi-machine memory sync, knowledge entry expiration, conflict resolution when two people edit the same repo's knowledge/), document it here rather than rebuilding from memory each time the question comes up.
+
+---
+
 ## What is NOT in this system
 
 These are common temptations to avoid:
