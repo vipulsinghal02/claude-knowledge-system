@@ -19,7 +19,8 @@ Full design rationale is in `knowledge-system-architecture.md` (this repo).
 
 ```
 claude-knowledge-system/
-├── knowledge-system-architecture.md   ← the canonical design doc (read this first)
+├── knowledge-system-architecture.md   ← the canonical design doc (claude reads this; humans read OVERVIEW.md)
+├── OVERVIEW.md                         ← An overview file for you to read (a bit more detailed than the readme)
 ├── install.sh                          ← symlinks files into ~/.claude/
 ├── README.md                           ← this file
 └── skills/
