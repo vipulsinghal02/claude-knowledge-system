@@ -2,7 +2,7 @@
 
 A four-layer persistence system for working with Claude Code.
 
-The premise: Claude has no memory across sessions by default. Without scaffolding, every session starts cold — prior decisions, conventions, and gotchas are lost. This repo holds the **canonical design doc and skills** that let context accumulate over time across however many repos you work in.
+The premise: Claude has no memory across sessions by default. Without scaffolding, every session starts cold. This repo holds the design doc and skills that let context accumulate over time. 
 
 ## The four layers
 
