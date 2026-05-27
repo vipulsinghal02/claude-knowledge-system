@@ -1,11 +1,17 @@
 # claude-knowledge-system
 
-A four-layer persistence system for working with Claude Code.
-
 The premise: Claude has no memory across sessions by default. Without scaffolding, every session starts cold. This repo holds the design doc and skills that let context accumulate over time. 
+
+> [!NOTE]
+> It was brought to my attention that Karpathy [already articulated this](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). This is basically that, and other implementations exist (see that thread). 
+
+In his words: 
+> Instead of just retrieving from raw documents at query time, the LLM incrementally builds and maintains a persistent wiki — a structured, interlinked collection of markdown files that sits between you and the raw sources. When you add a new source, the LLM doesn't just index it for later retrieval. It reads it, extracts the key information, and integrates it into the existing wiki — updating entity pages, revising topic summaries, noting where new data contradicts old claims, strengthening or challenging the evolving synthesis. The knowledge is compiled once and then kept current, not re-derived on every query.
+> -Karpathy
 
 ## The four layers
 
+This is a four-layer persistence system for working with Claude Code.
 | Layer | Lives in | Purpose |
 |---|---|---|
 | 1. **CLAUDE.md** | per-repo, project root | Loaded every session. Subproject map, must-know rules, commands. |
