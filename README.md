@@ -37,14 +37,14 @@ cd ~/repos/claude-knowledge-system
 ./install.sh
 ```
 
-`install.sh` creates symlinks in `~/.claude/` so Claude Code can discover the skills and architecture doc. It's idempotent — safe to re-run after `git pull`.
+`install.sh` creates symlinks in `~/.claude/` so Claude Code can discover the skills and architecture doc. 
 
 Verify:
 ```bash
 ls -la ~/.claude/skills/ ~/.claude/knowledge-system-architecture.md
 ```
 
-You should see four symlinks under `skills/` and one for the architecture doc, all pointing into this repo.
+You should see four symlinks under `skills/` and one for the architecture doc, all pointing into this repo. (Note: the skills slash commands don't seem to be working for me just yet. Will look into it later, but for now I've just been telling claude "read that skill markdown file and do the thing (!)"). 
 
 ## Bootstrap a new repo
 
@@ -58,7 +58,7 @@ The skill runs a pre-bootstrap diagnostic, asks ~4 questions about the repo (ext
 
 ## Why this exists
 
-- **Multi-repo work** drifts: every repo you touch accumulates its own conventions, gotchas, and decisions. Without persistence, you re-explain them every session.
+- **Multi-repo work** drifts: every repo you touch accumulates its own conventions, gotchas, and decisions. Without persistence, you re-explain them every session. (todo: need to figure out a single knowledge base across all the repos. not sure why I didn't just set it up one level up from all the repos from the start..)
 - **CLAUDE.md is per-repo**, so it can't be canonicalized. But the *design* of the system, the *skills* that operate on it, and the *procedure* for bootstrapping it absolutely can be — and that's this repo.
 - **Adding a new repo** to the system should be one slash command, not a 30-minute manual procedure. Hence `/setup-knowledge-system`.
 
