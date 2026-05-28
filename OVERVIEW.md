@@ -6,8 +6,6 @@ A way to make Claude actually **remember things** across sessions when you work 
 
 Every conversation with Claude Code starts cold. Yesterday you spent 20 minutes explaining your env setup, the team's testing conventions, a weird gotcha in your AWS pipeline, the reason your tests are structured oddly. Tomorrow you'll do it all again — because Claude has no memory of the previous chat.
 
-Across N repos this gets worse. Each repo has its own conventions, gotchas, and ongoing work. Every session, in every repo, you re-explain the same things.
-
 This system fixes that with **four layers of persistence** that sit next to your code. Claude reads them automatically at the start of each session, so context accumulates over time instead of evaporating.
 
 ## The four layers
