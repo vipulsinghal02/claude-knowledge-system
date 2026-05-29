@@ -135,7 +135,10 @@ If a piece of knowledge would benefit the team (not just you), copy it from your
 
 **"What's the relationship to the docs the team already maintains?"** Team docs (`docs/`, READMEs) stay where they are. The knowledge system **references** them via `[Ref]` entries in `knowledge/index.md` — never duplicates content. The system is additive, not a replacement.
 
-**"What if I learn something useful for a different repo too?"** Each repo's `knowledge/` is independent — an entry saved in repo A doesn't show up in repo B. If an insight applies to multiple repos, you either copy the file manually between knowledge dirs, or (better) promote it to the team's actual project docs where it belongs. Cross-repo knowledge transfer is a known gap; see the "Known limitations and open design questions" section of `knowledge-system-architecture.md`.
+**"What if I learn something useful for a different repo too?"** Each repo's `knowledge/` is independent — an entry saved in repo A doesn't auto-show up in repo B. Three options depending on the case:
+1. **Genuinely general insight** ("always use `ProcessPoolExecutor` for pandas") — copy the file manually between knowledge dirs, or promote it to the team's project docs. Still a known gap.
+2. **Authoritative content lives in repo A, consumer needs to find it from repo B** (e.g. you're in an analysis-notebooks repo and the upstream pipeline is documented in another repo) — use the **pointer-stub pattern**: create a tiny stub in `repo-B/.../knowledge/external_refs/<repo-A>/<slug>.md` with an absolute path to the source, and index it via a `[Ref-ext]` line in repo B's `index.md`. No content duplication, no drift. See "Procedure for pointing to another repo's knowledge entry" in `knowledge-system-architecture.md`.
+3. **Insight is repo-specific** — save it once, in that repo.
 
 ## Where to read more
 

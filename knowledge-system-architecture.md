@@ -520,7 +520,8 @@ Existing docs (README, ADRs, design docs, runbooks, wikis) often contain exactly
 |---|---|
 | Non-obvious decision rationale | `knowledge/[subproject]/[slug].md` |
 | Cross-project convention or constraint | `knowledge/cross_cutting/[slug].md` |
-| Reference to an external or existing doc | `knowledge/index.md` as a `[Ref]` entry |
+| Reference to an external or existing doc (same repo) | `knowledge/index.md` as a `[Ref]` entry |
+| Pointer to a knowledge entry in **another repo** | `knowledge/external_refs/<other-repo>/<slug>.md` stub + `[Ref-ext]` line in `index.md` (see "Procedure for pointing to another repo's knowledge entry" below) |
 | Something Claude should know every session | `CLAUDE.md` (or pointer from it) |
 | User behavioral preference / correction | Auto-memory file |
 | Step-by-step repeatable procedure | `~/.claude/skills/[name].md` |
@@ -594,20 +595,82 @@ For large repos, prioritize the areas you're actively working in. Extract the re
 
 ## Known limitations and open design questions
 
-### Cross-repo knowledge transfer is not supported
+### Cross-repo knowledge transfer: pointer-stub pattern (partial)
 
-Each repo's `knowledge/` is independent. An entry saved in repo A is not visible when working in repo B. The `cross_cutting/` subdirectory name is sometimes misread as cross-repo — it actually means **cross-subproject within a single repo**.
+Each repo's `knowledge/` is independent — an entry saved in repo A is not auto-visible when working in repo B. (The `cross_cutting/` subdirectory name is sometimes misread as cross-repo — it actually means **cross-subproject within a single repo**.)
 
-This matters for genuinely general insights (e.g. "always use `ProcessPoolExecutor` for pandas, never `ThreadPoolExecutor`" — true regardless of which repo you're in). Today, such an insight has to be saved in each repo's `knowledge/` separately.
+There are now **three options** for handling knowledge that spans repos, depending on what kind of cross-repo relationship it is:
 
-**Why it's not solved yet:** the obvious fix is a 5th "global knowledge" layer (`~/.claude/knowledge/`, or a `knowledge/` dir inside the scaffolding repo symlinked into `~/.claude/`). The hard part isn't infrastructure — it's **curation**. A flat global pool with hundreds of entries is no easier to surface than the per-repo dirs are. The right design probably involves:
+**(a) Same insight, equally true in both repos.** A genuinely general convention ("always use `ProcessPoolExecutor` for pandas, never `ThreadPoolExecutor`") — true regardless of which repo you're in. Either save it once in the originating repo and copy the file manually into other repos' `knowledge/` dirs, **or** promote it to your team's actual project docs / a wiki / an internal style guide. Still unsolved cleanly — see "Why a 5th global layer isn't built yet" below.
+
+**(b) Authoritative content lives in one repo, consumer needs to find it.** You work in repo B (e.g. an analysis-notebooks repo) and the upstream pipeline/data/library you depend on is documented in repo A's `knowledge/`. You don't want to duplicate (drift risk) but you do want repo B's index to surface the entry so future-you (or Claude) finds it when grepping. **This is the pointer-stub pattern** — see procedure below.
+
+**(c) Insight is specific to one repo.** Save it there only, don't propagate.
+
+#### Procedure for pointing to another repo's knowledge entry
+
+Goal: from inside repo B, make repo A's knowledge entries discoverable without duplicating their content.
+
+**Layout:**
+
+```
+<repo-B>/.../knowledge/
+  external_refs/
+    <repo-A-name>/
+      <slug>.md       ← one short stub per entry being pointed to
+      <slug>.md
+    <repo-C-name>/
+      <slug>.md
+```
+
+**Stub-file template** (typically <20 lines — it must not mirror source content, only point at it):
+
+```markdown
+**Source repo:** <other-repo-name>
+**Source path:** <absolute path to the source .md in the other repo>
+**Date checked:** YYYY-MM-DD
+**Tags:** <other-repo-name>, <topic>, external-pointer
+
+# <Title> (pointer)
+
+**Summary:** <one or two sentences — enough to grep for and to decide whether to follow the link. Do NOT mirror the source content; it will drift.>
+
+**Authoritative content:** [<source-filename>](<absolute path>)
+
+**Cross-refs in canonical KB:** [[entry-slug]], [[entry-slug]]
+```
+
+**Index entry** in repo B's `knowledge/index.md`, under a dedicated "References to other repos' knowledge bases" section (sibling to the existing `[Ref]` section). Use the `[Ref-ext]` tag:
+
+```markdown
+- [Ref-ext] [YYYY-MM-DD] **<other-repo> / <short title>** — <one-line hook> → external_refs/<other-repo>/<slug>.md
+```
+
+**Conventions and reasoning:**
+- **Absolute source paths**, not relative — the link must work regardless of cwd.
+- **`Date checked:` field** — external KBs evolve independently; the stub is a snapshot of "this entry existed and meant this on date X". If the date is stale (months old), re-verify before relying on it.
+- **No content mirroring** — the stub is a pointer, not a mini-copy. Mirroring guarantees drift and creates two places to update. Summary should be one or two sentences.
+- **`[[wiki-style cross-refs]]`** — link to entries that already exist in repo B's KB and are related to the external pointer (e.g. consumer-side entries that document how repo B uses what repo A produces). Improves grep-discoverability of related entries from the stub.
+- **Subproject row in CLAUDE.md and `index.md` subprojects table** — when you create `external_refs/` for the first time, add a row to both, matching the rule for any new subdirectory under `knowledge/`.
+- **Changelog rows** — one CREATE row per stub file, plus EDIT rows for `index.md` / `CLAUDE.md` if touched. Per the per-file changelog rule.
+
+**When to use this pattern (vs option (a) copying the file):**
+- The source repo is *actively maintained* and its KB will keep evolving — pointing avoids drift.
+- The source content is long enough that copying would create a real maintenance burden.
+- You only need the entry occasionally (consumer-side reference), not on every session.
+
+**When NOT to use:**
+- The source repo doesn't have a stable `knowledge/` (path will move) — copy instead.
+- The insight is fully general (option (a)) — copying or promoting to a wiki is fine.
+
+#### Why a 5th global layer isn't built yet
+
+Option (a) — the genuinely-general case — is still unsolved. The obvious fix is a 5th "global knowledge" layer (`~/.claude/knowledge/`, or a `knowledge/` dir inside the scaffolding repo symlinked into `~/.claude/`). The hard part isn't infrastructure — it's **curation**. A flat global pool with hundreds of entries is no easier to surface than the per-repo dirs are. The right design probably involves:
 - Explicit promotion ("this entry is useful everywhere — promote to global")
 - Tag-based filtering so global entries don't all load every session
 - Some convention for when to *de*-promote (when a "general" insight turns out to be repo-specific)
 
 None of that is designed yet, so the simpler per-repo model stands as the current shape. Possible future work.
-
-**Workaround for now:** if an insight applies to multiple repos, either (a) save it once in the originating repo and copy the file manually into other repos' `knowledge/` dirs, or (b) promote it to your team's actual project docs / a wiki / an internal style guide — i.e. the place where general knowledge lives outside this system.
 
 ### What else might land here over time
 
