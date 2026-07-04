@@ -85,19 +85,22 @@ All four resolve paths from the repo you're currently in. Same skills work every
 ## Getting started (5 minutes)
 
 ```bash
-# 1. Clone this repo
+# 1. Clone this repo (once per machine)
 git clone <repo-url> ~/repos/claude-knowledge-system
 
-# 2. Install (symlinks files into ~/.claude/)
+# 2. Install (symlinks files into ~/.claude/, once per machine)
 cd ~/repos/claude-knowledge-system && ./install.sh
 
-# 3. In any repo where you want the system:
+# 3. Restart Claude Code (close any open session, start a new one) —
+#    the skills list is only read at session start.
+
+# 4. In any repo where you want the system (repeat per project):
 cd ~/repos/your-project
 # ...then in your Claude Code session, type:
 /setup-knowledge-system
 ```
 
-That's it. After step 3, that repo is at full parity and you can start using `/learnthis`, `/logsession`, `/minechat` immediately.
+That's it. After step 4, that repo is at full parity and you can start using `/learnthis`, `/logsession`, `/minechat` immediately. Step 4 is the only one you repeat per project — steps 1–3 are one-time, machine-wide setup. If `/setup-knowledge-system` doesn't show up as a slash command, see "Troubleshooting" in `README.md` — nearly always it's step 3 (a stale open session) or a pre-existing file blocking the symlink, and `install.sh` now detects and fixes the latter automatically.
 
 ## Staying in sync (across machines or with team updates)
 
