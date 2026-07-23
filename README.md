@@ -45,6 +45,8 @@ claude-knowledge-system/
     └── setup-knowledge-system.md       ← /setup-knowledge-system: bootstrap a new repo
 ```
 
+Flat `.md` files here are intentional — this is the source layout. `install.sh` fans each one out into the nested `~/.claude/skills/<name>/SKILL.md` directory structure that Claude Code actually requires for discovery (see Install below).
+
 ## Install (once per machine)
 
 ```bash
@@ -57,9 +59,14 @@ cd ~/repos/claude-knowledge-system
 
 The script prints its own verification (symlink targets + a frontmatter check on every skill file), so you shouldn't need to inspect anything by hand. If you want to double check anyway:
 ```bash
-ls -la ~/.claude/skills/ ~/.claude/knowledge-system-architecture.md
+ls -la ~/.claude/skills/*/SKILL.md ~/.claude/knowledge-system-architecture.md
 ```
-You should see four **symlinks** under `skills/` (`learnthis.md`, `logsession.md`, `minechat.md`, `setup-knowledge-system.md`) and one for the architecture doc, all pointing into this repo. If any of them is a plain file instead of a symlink (`l` missing from the permissions column), something pre-existing blocked the install — `install.sh` will now detect this itself, back the stale file up, and replace it (see "Troubleshooting" below).
+You should see four **symlinks**, one at each of `skills/learnthis/SKILL.md`, `skills/logsession/SKILL.md`, `skills/minechat/SKILL.md`, `skills/setup-knowledge-system/SKILL.md`, plus one for the architecture doc — all pointing into this repo.
+
+> [!NOTE]
+> **Claude Code requires each personal skill to live in its own directory as `SKILL.md`** — `~/.claude/skills/<name>/SKILL.md`. A flat `~/.claude/skills/<name>.md` file is silently ignored by skill discovery, no error, no warning. (That flat layout is only valid for slash *commands* under `~/.claude/commands/` — an easy mix-up.) `install.sh` creates the correct nested layout automatically and cleans up any old flat symlinks it finds.
+
+If any `SKILL.md` is a plain file instead of a symlink (`l` missing from the permissions column), something pre-existing blocked the install — `install.sh` will now detect this itself, back the stale file up, and replace it (see "Troubleshooting" below).
 
 > [!IMPORTANT]
 > **Restart Claude Code after installing or updating.** The skills list is read once when a Claude Code session starts — if you had a session open while running `install.sh`, that session will not see the new/updated skills. Close it and open a fresh one (or start a new session in your terminal/IDE) before expecting `/learnthis` etc. to show up.
@@ -80,9 +87,10 @@ The skill runs a pre-bootstrap diagnostic, asks ~4 questions about the repo (ext
 
 **`/setup-knowledge-system` (or any of the four skills) doesn't show up as a slash command.** In order of likelihood:
 1. You haven't restarted Claude Code since running `install.sh` — see the note above. This is the most common cause.
-2. `install.sh` hasn't been run on this machine yet, or errored partway. Re-run it and read its output; it now reports success/failure per file.
-3. A stale, non-symlink file already existed at `~/.claude/skills/<name>.md` before you ever ran `install.sh` (this can happen if you hand-created a skill file before adopting this repo, or copy-pasted an old version). `install.sh` now detects this automatically, moves the stale file to a timestamped backup under `~/.claude/skills-backup-*/`, and replaces it with the correct symlink. Just re-run `./install.sh` and restart Claude Code.
-4. A skill file is missing its YAML frontmatter (`---\nname: ...\ndescription: ...\n---` at the very top). `install.sh`'s frontmatter check will flag this by name — but it shouldn't happen with files from this repo unless something got corrupted; if you see this, please open an issue.
+2. Your `~/.claude/skills/` predates the directory-per-skill layout and still has flat files (`~/.claude/skills/<name>.md` instead of `~/.claude/skills/<name>/SKILL.md`). This was the original bug in this repo's own `install.sh` and is the reason the script now migrates old flat symlinks and warns about old flat plain files automatically. Re-run `./install.sh` (safe, idempotent) and restart Claude Code.
+3. `install.sh` hasn't been run on this machine yet, or errored partway. Re-run it and read its output; it now reports success/failure per file.
+4. A stale, non-symlink `SKILL.md` already existed at `~/.claude/skills/<name>/SKILL.md` before you ever ran `install.sh`. `install.sh` now detects this automatically, moves the stale file to a timestamped backup under `~/.claude/skills-backup-*/`, and replaces it with the correct symlink.
+5. A skill file is missing its YAML frontmatter (`---\nname: ...\ndescription: ...\n---` at the very top). `install.sh`'s frontmatter check will flag this by name — but it shouldn't happen with files from this repo unless something got corrupted; if you see this, please open an issue.
 
 ## Why this exists
 

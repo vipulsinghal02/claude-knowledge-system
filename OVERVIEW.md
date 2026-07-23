@@ -100,7 +100,7 @@ cd ~/repos/your-project
 /setup-knowledge-system
 ```
 
-That's it. After step 4, that repo is at full parity and you can start using `/learnthis`, `/logsession`, `/minechat` immediately. Step 4 is the only one you repeat per project — steps 1–3 are one-time, machine-wide setup. If `/setup-knowledge-system` doesn't show up as a slash command, see "Troubleshooting" in `README.md` — nearly always it's step 3 (a stale open session) or a pre-existing file blocking the symlink, and `install.sh` now detects and fixes the latter automatically.
+That's it. After step 4, that repo is at full parity and you can start using `/learnthis`, `/logsession`, `/minechat` immediately. Step 4 is the only one you repeat per project — steps 1–3 are one-time, machine-wide setup. If `/setup-knowledge-system` doesn't show up as a slash command, see "Troubleshooting" in `README.md` — nearly always it's step 3 (a stale open session), a `~/.claude/skills/` left over from before the directory-per-skill layout was required, or a pre-existing file blocking the symlink. `install.sh` now detects and fixes all of these automatically.
 
 ## Staying in sync (across machines or with team updates)
 
