@@ -320,7 +320,9 @@ Appends a session summary to `knowledge/sessions.md`. Steps:
 
 Sessions log *what happened*. `/learnthis` logs *what was learned*. Don't overlap.
 
-**Skill file format** (`~/.claude/skills/[name].md`):
+**Skill file format** (`~/.claude/skills/[name]/SKILL.md`):
+
+Each personal skill lives in its **own directory** named after the skill, with the body in a file named `SKILL.md`. A flat `~/.claude/skills/[name].md` file is **silently ignored** — that layout is only valid for slash *commands* under `~/.claude/commands/`, not skills.
 
 Skills are discovered by YAML frontmatter — `name:` (must match the slash command) and `description:` (used to decide when the skill is relevant). The body is the procedure.
 
@@ -363,8 +365,7 @@ Run through this when creating or cloning a repo where you want this system:
 - [ ] If you-own-the-repo: commit all of the above. If externally-managed: skip — files stay local-only.
 
 **Global setup (one time per machine, shared across all projects):**
-- [ ] Create `~/.claude/skills/learnthis.md` using the content in this repo's system or the template above
-- [ ] Create `~/.claude/skills/logsession.md` using the content in this repo's system or the template above
+- [ ] Run `./install.sh` from the claude-knowledge-system clone — it symlinks each skill into `~/.claude/skills/[name]/SKILL.md` (the required nested layout) and migrates any old flat installs. Or, manually: `mkdir -p ~/.claude/skills/learnthis && cp/ln learnthis.md ~/.claude/skills/learnthis/SKILL.md` (same for `logsession`, etc.)
 
 **Per-session habit:**
 - At the start of non-trivial work: check `knowledge/index.md` (Claude does this automatically if CLAUDE.md is set up)
@@ -524,7 +525,7 @@ Existing docs (README, ADRs, design docs, runbooks, wikis) often contain exactly
 | Pointer to a knowledge entry in **another repo** | `knowledge/external_refs/<other-repo>/<slug>.md` stub + `[Ref-ext]` line in `index.md` (see "Procedure for pointing to another repo's knowledge entry" below) |
 | Something Claude should know every session | `CLAUDE.md` (or pointer from it) |
 | User behavioral preference / correction | Auto-memory file |
-| Step-by-step repeatable procedure | `~/.claude/skills/[name].md` |
+| Step-by-step repeatable procedure | `~/.claude/skills/[name]/SKILL.md` |
 | What the code does | Leave it in the code |
 
 ---

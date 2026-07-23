@@ -24,10 +24,24 @@ ARCH_LINK="$CLAUDE_DIR/knowledge-system-architecture.md"
 ln -sfn "$REPO_DIR/knowledge-system-architecture.md" "$ARCH_LINK"
 echo "  symlinked $ARCH_LINK -> $REPO_DIR/knowledge-system-architecture.md"
 
-# Skills → ~/.claude/skills/<name>.md
+# Skills → ~/.claude/skills/<name>/SKILL.md
+# Claude Code discovers a personal skill only when it lives in its own directory
+# as SKILL.md. A flat ~/.claude/skills/<name>.md file is silently ignored.
 for skill_path in "$REPO_DIR"/skills/*.md; do
-    skill_name="$(basename "$skill_path")"
-    target="$SKILLS_DIR/$skill_name"
+    skill_file="$(basename "$skill_path")"       # e.g. learnthis.md
+    skill_name="${skill_file%.md}"               # e.g. learnthis
+
+    # Migrate any old flat install: ~/.claude/skills/<name>.md
+    legacy="$SKILLS_DIR/$skill_file"
+    if [[ -L "$legacy" ]]; then
+        rm "$legacy"
+        echo "  removed legacy flat symlink $legacy"
+    elif [[ -f "$legacy" ]]; then
+        echo "  WARN: $legacy is a regular file, not a symlink. Move it aside; leaving as-is."
+    fi
+
+    skill_dir="$SKILLS_DIR/$skill_name"
+    target="$skill_dir/SKILL.md"
 
     # If target exists and is a regular file (not a symlink), it's a stale copy
     # blocking discovery of the real skill. Back it up and replace it — don't
@@ -38,6 +52,7 @@ for skill_path in "$REPO_DIR"/skills/*.md; do
         echo "  !! $target was a plain file (not a symlink) — moved to $BACKUP_DIR/$skill_name and replaced with a symlink"
         STALE_FOUND=1
     fi
+    mkdir -p "$skill_dir"
     ln -sfn "$skill_path" "$target"
     echo "  symlinked $target -> $skill_path"
 done
