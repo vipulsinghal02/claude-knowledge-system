@@ -3,7 +3,7 @@
 The premise: Claude has no memory across sessions by default. Without scaffolding, every session starts cold. This repo holds the design doc and skills that let context accumulate over time. 
 
 > [!NOTE]
-> It was brought to my attention that Karpathy [already articulated this](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f). This is basically that, and other implementations exist (see that thread). 
+> Karpathy [was also thinking about something like this](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f), and other implementations exist (see that thread). 
 
 In his words: 
 > Instead of just retrieving from raw documents at query time, the LLM incrementally builds and maintains a persistent wiki — a structured, interlinked collection of markdown files that sits between you and the raw sources. When you add a new source, the LLM doesn't just index it for later retrieval. It reads it, extracts the key information, and integrates it into the existing wiki — updating entity pages, revising topic summaries, noting where new data contradicts old claims, strengthening or challenging the evolving synthesis. The knowledge is compiled once and then kept current, not re-derived on every query.
@@ -14,7 +14,7 @@ In his words:
 It's easy to conflate these. There are always exactly two:
 
 1. **This repo (`claude-knowledge-system`)** — the scaffolding/tooling. You clone it **once**, to one location on your machine (e.g. `~/repos/claude-knowledge-system`). You run `./install.sh` **once per machine** (re-run it after `git pull` when it updates). This repo's job is to get the skills (`/learnthis`, `/logsession`, `/minechat`, `/setup-knowledge-system`) registered globally in `~/.claude/skills/`, so they're available in **every** Claude Code session on that machine, regardless of which project you're working in.
-2. **Your project repos** (e.g. `NullStrike`, or any other repo you work in) — where the actual knowledge accumulates. You do **not** clone or copy anything from this repo into them. Instead, once installed, open Claude Code in that project and run the now-globally-available `/setup-knowledge-system` skill. It scaffolds `CLAUDE.md`, `knowledge/`, and `changelog.md` **inside that project**, tailored to it.
+2. **Your project repos** (e.g. `terray_notebooks`, or any other repo you work in) — where the actual knowledge accumulates. You do **not** clone or copy anything from this repo into them. Instead, once installed, open Claude Code in that project and run the now-globally-available `/setup-knowledge-system` skill. It scaffolds `CLAUDE.md`, `knowledge/`, and `changelog.md` **inside that project**, tailored to it.
 
 So: one install, many projects. You'll run `/setup-knowledge-system` once per project you want this in, but you never touch `install.sh` again unless this scaffolding repo itself changes.
 
